@@ -18,7 +18,7 @@ sudo apt-get update
 
 sudo apt-get upgrade -y
 
-sudo apt-get install software-properties-common
+sudo apt-get install software-properties-common -y
 
 sudo apt-add-repository ppa:ansible/ansible -y
 
@@ -137,10 +137,12 @@ sudo apt-get install ansible -y
     # the db will have the sql installed and enabled
     apt: pkg=mysql-server state=present
 ```
+- to run a `.yml` file with ansible: `sudo ansible-playbook FILE_NAME.yml`
 
-#### vault
+#### vault (for AWS)
 - in `/etc/ansible/` create a directory called `group_vars`, and another called `all` inside it
 - create a file called `pass.yml` with this command: `sudo ansible-vault create pass.yml`
+- to edit this file: `sudo ansible-vault edit group_vars/all/pass.yml`
 - here press the "i" key to enter insert mode, then add the lines:
 ```
 aws_access_key: MY_ACCESS_KEY
@@ -148,3 +150,12 @@ aws_secret_key: MY_SECRET_KEY
 ```
 the save by pressing "esc" and inserting :wq
 - After this, many sensitive ansible commands will require the additional string `--ask-vault-pass` + the password
+
+#### AWS task
+- Launch an ec2 instance (controller) either from your local machine (using or another ec2 instance on AWS
+- use ansible playbooks to launch another 2 machines on AWS (app and database)
+- implement 2 tier architecture as IAC with Ansible
+- nodeapp to work with public ip and db to work with /posts
+
+- deadline to submit the task is 9am 06/05/2021
+
