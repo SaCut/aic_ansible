@@ -13,8 +13,6 @@
 
 #### after vagrant up
 - `ssh vagrant@CONTROLLER_IP`
-
-- 
 ```shell
 sudo apt-get update
 
@@ -43,3 +41,95 @@ sudo apt-get install ansible -y
 #### task
 - find out uptime: `ansible all -a "uptime"`
 - update and upgrade: `ansible all -m shell -a "sudo apt-get update -y && sudo apt-get upgrade -y"`
+
+#### Playbooks
+- playbooks are stored in `/etc/ansible/`
+- `/etc/ansible/` tree:
+```shell
+.
+├── ansible.cfg
+├── hosts
+├── install_mongodb.yml
+├── install_nginx.yml
+├── install_nodejs.yml
+├── install_sql.yml
+└── roles
+```
+- inside `hosts`:
+```
+[web]
+192.168.33.10 ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+
+[db]
+192.168.33.11 ansible_connection=ssh ansible_ssh_user=vagrant ansible_ssh_pass=vagrant
+```
+- inside `install_mongodb.yml`:
+```yml
+---
+# Installing Mongodb for our db to connect to the web app for "/posts"
+
+- hosts: db
+  gather_facts: true
+  become: true
+  
+  tasks:
+  - name: Installing Mongodb into DB server 192.168.33.11
+    apt: pkg=mongodb state=present
+```
+- inside `install_nginx.yml`:
+```yml
+# This is an example of an ansible playbook written in YAML
+# YAML files start with three dashes
+
+---
+
+# hosts defines the name of your host machine
+- hosts: web
+
+  # gathering facts before performing any task
+  gather_facts: yes
+
+  # be administrator
+  become: true
+
+  # 
+  tasks:
+    # tasks are executed in order, one at a time, against all ser$
+    # every task shoud have a name, which is included in the outp$
+    # the goal of each task is to execute a module with specific $
+
+    # in this task we would like to install nginx on our web serv$
+    - name: Installing NginX
+      apt: pkg=nginx state=present
+```
+- inside `install_nodejs.yml`:
+```yml
+---
+  - hosts: web
+    gather_facts: true
+    become: true
+    
+    tasks:
+    - name: Installing nodejs in "web" server
+      apt: pkg=nodejs state=present
+      
+    - name: Installing NPM
+      apt: pkg=npm state=present
+```
+- inside `install_sql.yml`:
+```yml
+---
+# install SQL on db machine
+- hosts: db
+# hosts will look for db in inventory file
+
+  # run as admin
+  become: true
+  
+  # instructions/code/script to install SQL
+  tasks:
+  - name: installing SQL in the DB server
+    
+    # the db will have the sql installed and enabled
+    apt: pkg=mysql-server state=present
+```
