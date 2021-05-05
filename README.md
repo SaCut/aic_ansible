@@ -25,6 +25,10 @@ sudo apt-add-repository ppa:ansible/ansible -y
 sudo apt-get update
 
 sudo apt-get install ansible -y
+
+sudo apt-get install python3 python3-pip -y
+
+sudo pip3 install boto boto3
 ```
 
 #### notes
@@ -159,3 +163,15 @@ the save by pressing "esc" and inserting :wq
 
 - deadline to submit the task is 9am 06/05/2021
 
+#### solution
+- `ssh -i ~/.ssh/eng84devops ubuntu@PUBLIC_IP`
+- - update instances IPs in `/etc/ansible/hosts`
+
+- if new controller:
+    - create new file with `sudo ansible-vault create /etc/ansible/group_vars/pass.yml` + passwd + credentials
+    - run `scp -ri eng84devops.pem /home/saverio/Projects/sparta-global/aic-ansible/ ubuntu@PUBLIC_ID_OF_CONTROLLER:/etc/ansible/`
+- run `ansible-playbook /etc/ansible/db_provision.yml`, then `ansible-playbook /etc/ansible/app_provision.yml` 
+
+
+######### notes
+runuser -l ubuntu -c 'sudo npm install'

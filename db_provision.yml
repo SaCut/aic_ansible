@@ -1,0 +1,18 @@
+---
+  - hosts: db
+    gather_facts: true
+    become: true
+    
+    tasks:
+    
+    - name: Clearing the path
+      file:
+        state: absent
+        path: /home/ubuntu/provision
+      
+    - name: Cloning the Git-Hub repository
+      shell:
+        cmd: git clone https://github.com/SaCut/provision
+
+    - name: Provisioning the db instance
+      ansible.builtin.command: bash /home/ubuntu/provision/provision_db.sh
