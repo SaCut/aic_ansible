@@ -48,12 +48,16 @@ sudo apt-get install ansible -y
 ```shell
 .
 ├── ansible.cfg
+├── group_vars
+│   └── all
+│       └── pass.yml
 ├── hosts
 ├── install_mongodb.yml
 ├── install_nginx.yml
 ├── install_nodejs.yml
 ├── install_sql.yml
-└── roles
+├── roles
+└── setup_node_and_db.yml
 ```
 - inside `hosts`:
 ```
@@ -133,3 +137,14 @@ sudo apt-get install ansible -y
     # the db will have the sql installed and enabled
     apt: pkg=mysql-server state=present
 ```
+
+#### vault
+- in `/etc/ansible/` create a directory called `group_vars`, and another called `all` inside it
+- create a file called `pass.yml` with this command: `sudo ansible-vault create pass.yml`
+- here press the "i" key to enter insert mode, then add the lines:
+```
+aws_access_key: MY_ACCESS_KEY
+aws_secret_key: MY_SECRET_KEY
+```
+the save by pressing "esc" and inserting :wq
+- After this, many sensitive ansible commands will require the additional string `--ask-vault-pass` + the password
