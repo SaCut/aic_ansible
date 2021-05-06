@@ -23,6 +23,11 @@
     app_name: "{{ base_name }}_app"
     db_name: "{{ base_name }}_db"
     
+    # conditional statements to select the instances to be created
+    # create_1: True
+    # create_2: True
+    # create_3: True
+    
 
   tasks:
     - name: Gathering facts

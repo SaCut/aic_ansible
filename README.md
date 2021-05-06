@@ -41,6 +41,7 @@ sudo pip3 install boto boto3
 - to run ad-hoc command from ansible controller into machine: `ansible MACHINE_NAME -a "COMMAND"`
 - example: `ansible web -a "free -m"` gives the available RAM memory
 - another example: `ansible web -m shell -a "ls -a"`
+- check yaml file syntax: `ansible-playbook FILE_NAME.yml --syntax-check`
 
 #### task
 - find out uptime: `ansible all -a "uptime"`
@@ -170,8 +171,6 @@ the save by pressing "esc" and inserting :wq
 - if new controller:
     - create new file with `sudo ansible-vault create /etc/ansible/group_vars/pass.yml` + passwd + credentials
     - run `scp -ri eng84devops.pem /home/saverio/Projects/sparta-global/aic-ansible/ ubuntu@PUBLIC_ID_OF_CONTROLLER:/etc/ansible/`
-- run `ansible-playbook /etc/ansible/db_provision.yml`, then `ansible-playbook /etc/ansible/app_provision.yml` 
+    - create instances `ansible-playbook PLAYBOOK_NAME.yml --ask-vault-pass --tags create_ec2`
+- run `sudo ansible-playbook /etc/ansible/db_provision.yml`, then `sudo ansible-playbook /etc/ansible/app_provision.yml` 
 
-
-######### notes
-runuser -l ubuntu -c 'sudo npm install'
