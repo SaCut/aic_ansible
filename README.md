@@ -174,3 +174,5 @@ the save by pressing "esc" and inserting :wq
     - create instances `ansible-playbook PLAYBOOK_NAME.yml --ask-vault-pass --tags create_ec2`
 - run `sudo ansible-playbook /etc/ansible/db_provision.yml`, then `sudo ansible-playbook /etc/ansible/app_provision.yml` 
 
+#### Amazon Cloudwatch
+![img](https://i.imgur.com/0VCHhQU.png)
