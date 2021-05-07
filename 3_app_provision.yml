@@ -2,7 +2,7 @@
   - hosts: app
     gather_facts: true
     become: true
-    # two tags in this file: "--script" and "--manual"
+    # two tags in this file: "provision" and "node"
 
 
     tasks:
@@ -11,11 +11,11 @@
       file:
         path: /home/ubuntu/provision
         state: absent
-      
+
     - name: Cloning the Git-Hub repository
-      - git:
+      git:
         repo: https://github.com/SaCut/provision.git
-        dest: /home/ubuntu
+        dest: /home/ubuntu/provision
     # ---- repo cloned ----
 
 
@@ -24,54 +24,82 @@
     # writes port code to "/etc/nginx/sites-available/default"
     # seeds the database and launches app.js
     - name: Provisioning app instance with shell script
+
       block:
-        script: /home/ubuntu/provision/provision_app.sh
-        script: /home/ubuntu/provision/seed_and_start.sh
-        
-      tags: ['never', 'script']
+
+        - name: making provisioning script executable
+          file:
+            path: /home/ubuntu/provision/provision_app.sh
+            mode: 0755
+
+        - name: running provisioning script
+          block:
+            shell:
+              cmd: /home/ubuntu/provision/provision_app.sh
+
+          tags: ['never', 'provision']
+
+        - name: setup the node
+
+          block:
+          - name: running seeding script
+            shell:
+              cmd: nodejs /home/ubuntu/provision/app/seeds/seed.js
+
+#          - name: running nodejs
+#            shell:
+#              cmd: nohup nodejs /home/ubuntu/provision/app/app.js &
+
+            tags: ['never', 'node']
+          
+           - name: create service file
+             shell:
+               cmd: mv /home/ubuntu/provision/webapp.service /etc/systemd/system/webapp.service
+
+
+           - name: Enable webapp
+             service: name=webapp state=started enabled=yes
 
 
 
 
 
 
-
-
-    # same as previous but not script
-    - name: Provisioning app instance manually
-      block:
-        - name: Restarting service NginX
-          service:
-            name: nginx
-            state: restarted
-            enabled: yes
-
-        - name: Installing npm
-          apt:
-            pkg: npm
-            state: present
-      
-        - name: Downloading Nodejs-6.x
-          get_url:
-            url: https://deb.nodesource.com/setup_6.x
-            dest: /home/ubuntu/nodejs6.sh
-     
-        - name: Preparing nodejs version
-          shell: 
-            cmd: bash /home/ubuntu/nodejs6.sh
-
-        - name: Installing nodejs in "web" server
-          shell:
-            cmd: sudo apt-get install nodejs -y
-
-        - name: Installing pm2
-          shell:
-            cmd: npm install -g pm2
-
-        - name: Launching the app
-          - script: /home/ubuntu/provision/seed_and_start.sh
-      
-      tags: ['never', 'manual']
+#    # same as previous but not script
+#    - name: Provisioning app instance manually
+#      block:
+#        - name: Restarting service NginX
+#          service:
+#            name: nginx
+#            state: restarted
+#            enabled: yes
+#
+#        - name: Installing npm
+#          apt:
+#            pkg: npm
+#           state: present
+#      
+#        - name: Downloading Nodejs-6.x
+#          get_url:
+#            url: https://deb.nodesource.com/setup_6.x
+#            dest: /home/ubuntu/nodejs6.sh
+#    
+#        - name: Preparing nodejs version
+#          shell: 
+#            cmd: bash /home/ubuntu/nodejs6.sh
+#
+#        - name: Installing nodejs in "web" server
+#          shell:
+#            cmd: sudo apt-get install nodejs -y
+#
+#        - name: Installing pm2
+#          shell:
+#            cmd: npm install -g pm2
+#
+#        - name: Launching the app
+#          script: /home/ubuntu/provision/seed_and_start.sh
+#      
+#      tags: ['never', 'manual']
 
 
 #    - name: update and upgrade

@@ -11,11 +11,19 @@
         state: absent
       
     - name: Cloning the Git-Hub repository
-      - git:
+      git:
         repo: https://github.com/SaCut/provision.git
         dest: /home/ubuntu
     # ---- repo cloned ----
 
     - name: Provisioning the db instance
+
       block:
-        script: /home/ubuntu/provision/provision_db.sh
+        - name: making provision executable
+          file:
+            path: /home/ubuntu/provision/provision_db.sh
+            mode: 0755
+
+        - name: running provisioning script
+          shell:
+            cmd: /home/ubuntu/provision/provision_db.sh

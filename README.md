@@ -173,7 +173,7 @@ the save by pressing "esc" and inserting :wq
 - if new controller:
     - create new file with `sudo ansible-vault create /etc/ansible/group_vars/pass.yml` + passwd + credentials
     - run `scp -ri eng84devops.pem /home/saverio/Projects/sparta-global/aic-ansible/ ubuntu@PUBLIC_ID_OF_CONTROLLER:/etc/ansible/`
-    - create instances `ansible-playbook PLAYBOOK_NAME.yml --ask-vault-pass --tags create_ec2`
+    - create instances `ansible-playbook PLAYBOOK_NAME.yml --ask-vault-pass --tags "TAG_1, TAG_2"/TAG`
 - run `sudo ansible-playbook /etc/ansible/db_provision.yml`, then `sudo ansible-playbook /etc/ansible/app_provision.yml` 
 
 #### Amazon Cloudwatch

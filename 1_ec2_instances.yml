@@ -20,7 +20,7 @@
     private_subnet: subnet-0f472765d50f64bd2
     app_sg_name: "eng84_saverio_2tier_app_SG"
     db_sg_name: "eng84_saverio_2tier_db_SG"
-    base_name: "eng84_sav_ans"
+    base_name: "eng84_sav_ansible"
     ctrl_name: "{{ base_name }}_controller"
     app_name: "{{ base_name }}_app"
     db_name: "{{ base_name }}_db"
@@ -31,7 +31,7 @@
     - name: Gathering facts
       block:
       - name: Get instances facts
-        ec2_instance_facts:
+        ec2_instance_info:
           # password for ansible
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
@@ -45,11 +45,10 @@
       block:
 
       - name: Creating Controller instance
-        ec2_instance:
+        ec2:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
-          id: "{{ ctrl_name }}"
           vpc_subnet_id: "{{ public_subnet }}"
           group_id: "{{ public_sg }}" # security group for controller
           private_ip: 10.0.1.100
@@ -65,15 +64,14 @@
         tags: ['never', 'ctrl']
       
       - name: Creating Webapp instance
-        ec2_instance:
+        ec2:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
-          id: "{{ app_name }}"
           vpc_subnet_id: "{{ public_subnet }}"
           assign_public_ip: yes
           group_id: "{{ public_sg }}" # security group for app
-          private_id: 10.0.1.101
+          private_ip: 10.0.1.101
           image: "{{ image_16 }}"
           instance_type: t2.micro
           region: "{{ region }}"
@@ -85,14 +83,13 @@
         tags: ['never', 'app']
 
       - name: Creating Db instance
-        ec2_instance:
+        ec2:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
-          id: "{{ db_name }}"
           private_ip: 10.0.2.100
           vpc_subnet_id: "{{ public_subnet }}"
-          assign_public_ip: no
+          assign_public_ip: yes
           group_id: "{{ private_sg }}" # security group for db
           image: "{{ image_16 }}"
           instance_type: t2.micro
