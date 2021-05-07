@@ -1,0 +1,21 @@
+---
+  - hosts: db
+    gather_facts: true
+    become: true
+    
+    tasks:
+    # ---- from here we clone the repo ----
+    - name: Clearing the path
+      file:
+        path: /home/ubuntu/provision
+        state: absent
+      
+    - name: Cloning the Git-Hub repository
+      - git:
+        repo: https://github.com/SaCut/provision.git
+        dest: /home/ubuntu
+    # ---- repo cloned ----
+
+    - name: Provisioning the db instance
+      block:
+        script: /home/ubuntu/provision/provision_db.sh

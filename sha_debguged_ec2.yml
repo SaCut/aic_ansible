@@ -7,7 +7,7 @@
   become: True
 
   vars:
-    key_name: DevOpsStudents
+    key_name: eng84devops
     region: eu-west-1
     image: ami-05ddd896984ff509a
     id: "Node-app"

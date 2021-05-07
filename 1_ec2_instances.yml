@@ -2,16 +2,18 @@
 ---
 
 - hosts: localhost
-  vars_files:
-      - ./group_vars/all/pass.yml
+  vars_files: /etc/ansible/group_vars/all/pass.yml
   connection: local
   gather_facts: False
+  # three tags in this file: "--ctrl", "--app" and "--db"
 
+
+  # define file variables
   vars:
     key_name: eng84devops
     region: eu-west-1
     image_18: ami-0943382e114f188e8 # Ubuntu server 18.04
-    image_16: ami-038d7b856fe7557b3
+    image_16: ami-038d7b856fe7557b3 # Ubuntu server 16.04
     public_sg: sg-0481a3f9b8c983591
     private_sg: sg-080e175ca87c0c77e
     public_subnet: subnet-03ae704f56ee877c2
@@ -23,13 +25,9 @@
     app_name: "{{ base_name }}_app"
     db_name: "{{ base_name }}_db"
     
-    # conditional statements to select the instances to be created
-    # create_1: True
-    # create_2: True
-    # create_3: True
-    
 
   tasks:
+    
     - name: Gathering facts
       block:
       - name: Get instances facts
@@ -40,34 +38,21 @@
           region: "{{ region }}"
         register: result
 
-#      - name: Instances ID
-#        debug:
-#          msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public DNS: {{ item.public_dns_name }}"
-#        loop: "{{ result.instances }}"
-
       tags: always
 
 
     - name: EC2 instances
       block:
 
-      - name: Upload public key to AWS
-        ec2_key:
-         name: "{{ key_name }}"
-         key_material: "{{ lookup('file', '/home/saverio/.ssh/{{ key_name }}.pub') }}"
-         region: "{{ region }}"
-         aws_access_key: "{{ec2_access_key}}"
-         aws_secret_key: "{{ec2_secret_key}}"
-
-
       - name: Creating Controller instance
-        ec2:
+        ec2_instance:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
           id: "{{ ctrl_name }}"
           vpc_subnet_id: "{{ public_subnet }}"
           group_id: "{{ public_sg }}" # security group for controller
+          private_ip: 10.0.1.100
           image: "{{ image_18 }}"
           instance_type: t2.micro
           region: "{{ region }}"
@@ -76,9 +61,11 @@
           assign_public_ip: yes
           instance_tags:
             Name: eng84_savi_ans_controller
+         
+        tags: ['never', 'ctrl']
       
       - name: Creating Webapp instance
-        ec2:
+        ec2_instance:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
@@ -86,20 +73,24 @@
           vpc_subnet_id: "{{ public_subnet }}"
           assign_public_ip: yes
           group_id: "{{ public_sg }}" # security group for app
+          private_id: 10.0.1.101
           image: "{{ image_16 }}"
           instance_type: t2.micro
           region: "{{ region }}"
           wait: true
           count: 1
           instance_tags:
-            Name: eng84_savi_ans_app
+            Name: "{{ app_name }}"
+            
+        tags: ['never', 'app']
 
       - name: Creating Db instance
-        ec2:
+        ec2_instance:
           aws_access_key: "{{ aws_access_key }}"
           aws_secret_key: "{{ aws_secret_key }}"
           key_name: "{{ key_name }}"
           id: "{{ db_name }}"
+          private_ip: 10.0.2.100
           vpc_subnet_id: "{{ public_subnet }}"
           assign_public_ip: no
           group_id: "{{ private_sg }}" # security group for db
@@ -109,7 +100,6 @@
           wait: true
           count: 1
           instance_tags:
-            Name: eng84_savi_ans_db
+            Name: "{{ db_name }}"
 
-      tags: always
-#      tags: ['never', 'create_ec2']
+        tags: ['never', 'db']

@@ -28,7 +28,7 @@ sudo apt-get install ansible -y
 
 sudo apt-get install python3 python3-pip -y
 
-sudo pip3 install boto boto3
+sudo pip3 install boto3
 ```
 
 #### notes
@@ -42,6 +42,8 @@ sudo pip3 install boto boto3
 - example: `ansible web -a "free -m"` gives the available RAM memory
 - another example: `ansible web -m shell -a "ls -a"`
 - check yaml file syntax: `ansible-playbook FILE_NAME.yml --syntax-check`
+- run playbook with tags: `ansible-playbook FILE_NAME.yml --tags "TAG_1, TAG_2"`
+- excluding tags: `ansible-playbook FILE_NAME.yml --skip-tags "TAG_1, TAG_2"`
 
 #### task
 - find out uptime: `ansible all -a "uptime"`

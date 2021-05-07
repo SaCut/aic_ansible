@@ -13,7 +13,7 @@
 
   # Install node js and NPM
 
-  - hosts: web
+  - hosts: app
     gather_facts: true
     become: true
 
@@ -45,5 +45,5 @@
         
         environment:
         # This is where you enter the environment variable to tell the app where to look for the db
-        DB_HOST: mongodb://ubuntu@<ENTER DB IP HERE>:27017/posts?authSource=admin
+        DB_HOST: mongodb://ubuntu@10.0.2.100:27017/posts?authSource=admin
         become_user: root
